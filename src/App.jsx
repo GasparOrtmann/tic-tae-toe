@@ -6,6 +6,7 @@ const TURNS = {
 }
 
 // Dibuja los cuadrados del tablero
+// eslint-disable-next-line react/prop-types
 const Square = ({ children, isSelected, updateBoard, index}) => {
   const className = `square ${isSelected ? 'is-selected' : ''}`
 
@@ -54,6 +55,18 @@ function App() {
     return null
   }
 
+  const resetGame = () => {
+    setBoard(Array(9).fill(null))
+    setTurn(TURNS.X)
+    setWinner(null)
+  }
+
+  const checkEndGame = (newBoard) => {
+      //revisar si hay empate
+      // y si no hay espacios vacios en el tablero
+      return newBoard.every((square) => square != null)
+  } 
+
   const updateBoard = (index) => {
     // no actualizamos posicion que ya tenga algo distinto de null
     if (board[index] || winner) return
@@ -70,12 +83,17 @@ function App() {
     const newWinner = checkWinner(newBoard)
     if (newWinner){
       setWinner(newWinner)
+    } else if (checkEndGame(newBoard)) {
+      setWinner(false)
     }
   }
 
+
+  // _ es la primera posicion, tambien podemos usar square
   return (
     <main className='board'>
       <h1>Tic Tac Toe</h1>
+      <button onClick={resetGame}>Reset del juego</button>
       <section className="game">
       {
         board.map((_, index) => {
@@ -100,6 +118,33 @@ function App() {
           {TURNS.O}
         </Square>
       </section>
+
+      {
+        winner != null && (
+          <section className="winner">
+            <div className="text">
+              <h2>
+                {
+                  winner == false ? 'Empate'
+                  : 'Ganador: ' + winner
+                }
+              </h2>
+
+              <header className="win">
+                {
+                  winner && <Square>
+                    {winner}
+                  </Square>
+                }
+              </header>
+
+              <footer>
+                <button onClick={resetGame}>Empezar de nuevo</button>
+              </footer>
+            </div>
+          </section>
+        )
+      }
     </main>
   )
 }
